@@ -1,0 +1,104 @@
+{
+    "identifier": "cc.aeron.nova-mypy",
+    "name": "Mypy",
+    "organization": "Aeron",
+    "description": "Mypy, an optional static type checker for Python, for Nova.",
+    "version": "0.1.0",
+    "categories": ["issues", "commands"],
+    "repository": "https://github.com/Aeron/Mypy.novaextension",
+    "bugs": "https://github.com/Aeron/Mypy.novaextension/issues",
+    "license": "Apache-2.0",
+    "main": "main.js",
+    "activationEvents": [
+        "onLanguage:python"
+    ],
+    "entitlements": {
+        "process": true,
+        "filesystem": "readwrite"
+    },
+    "commands": {
+        "editor": [
+            {
+                "title": "Check with Mypy",
+                "command": "checkWithMypy",
+                "shortcut": "shift-cmd-M",
+                "filters": {
+                    "syntaxes": ["python"]
+                }
+            }
+        ]
+    },
+    "issueMatchers": {
+        "mypy": {
+            "pattern": {
+                "regexp": "^(.*\\.py):([0-9]+):([0-9]+):\\s([a-z]+):\\s(.*)",
+                "message": 5,
+                "code": 4,
+                "line": 2,
+                "column": 3,
+                "severity": "error"
+            }
+        }
+    },
+    "config": [
+        {
+            "key": "cc.aeron.nova-mypy.executablePath",
+            "title": "Executable Path",
+            "description": "Path to the Mypy executable.",
+            "type": "path",
+            "default": "/usr/local/bin/mypy"
+        },
+        {
+            "key": "cc.aeron.nova-mypy.commandArguments",
+            "title": "Command Arguments",
+            "description": "Additional arguments. The --shadow-file option conditionally set.",
+            "type": "string",
+            "default": null
+        },
+        {
+            "key": "cc.aeron.nova-mypy.checkMode",
+            "title": "Check Mode",
+            "description": "An event on which to perform a check.",
+            "type": "enum",
+            "values": [
+                ["onChange", "On a file change"],
+                ["onSave", "On a file save"],
+                ["-", "Command only"]
+            ],
+            "default": "onChange"
+        }
+    ],
+    "configWorkspace": [
+        {
+            "key": "cc.aeron.nova-mypy.executablePath",
+            "title": "Executable Path",
+            "description": "Path to the Mypy executable.",
+            "type": "path",
+            "placeholder": "/usr/local/bin/mypy"
+        },
+        {
+            "key": "cc.aeron.nova-mypy.commandArguments",
+            "title": "Command Arguments",
+            "description": "Additional arguments. The --shadow-file option conditionally set.",
+            "type": "string"
+        },
+        {
+            "key": "cc.aeron.nova-mypy.pythonExecutablePath",
+            "title": "Python Executable Path",
+            "description": "Path to the Python executable. It’s the equivalent to use of the --python-executable option.",
+            "type": "path",
+            "placeholder": ".venv/bin/python"
+        },
+        {
+            "key": "cc.aeron.nova-mypy.checkMode",
+            "title": "Check Mode",
+            "description": "An event on which to perform a check.",
+            "type": "enum",
+            "values": [
+                ["onChange", "On a file change"],
+                ["onSave", "On a file save"],
+                ["-", "Command only"]
+            ]
+        }
+    ]
+}
