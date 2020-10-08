@@ -27,8 +27,8 @@ or if `/usr/bin/env` usage is desirable.
 In the case of `/usr/bin/env`, it becomes the executable path, and `mypy` becomes
 the first argument.
 
-Also, there is a Python executable path available as a workspace-only option.
-It’s just a handy alias for the --python-executable command argument.
+Also, there is a _Python executable_ path available as a workspace-only option.
+It’s just a handy alias for the `--python-executable` command argument.
 
 ### mypy.ini
 
