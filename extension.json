@@ -31,7 +31,7 @@
     "issueMatchers": {
         "mypy": {
             "pattern": {
-                "regexp": "^(.*\\.py):([0-9]+):([0-9]+):\\s([a-z]+):\\s(.*)",
+                "regexp": "^(.*\\.py):(\\d+):(\\d+:)?\\s(\\w+):\\s(.*)",
                 "message": 5,
                 "code": 4,
                 "line": 2,
