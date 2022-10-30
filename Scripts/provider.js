@@ -108,7 +108,9 @@ class IssuesProvider {
 
             console.info("Found " + parser.issues.length + " issue(s)");
 
-            nova.fs.remove(tmpPath);
+            if (tmpPath) {
+                nova.fs.remove(tmpPath);
+            }
             resolve(parser.issues);
             parser.clear();
         });
