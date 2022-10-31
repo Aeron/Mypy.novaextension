@@ -3,7 +3,7 @@
     "name": "Mypy",
     "organization": "Aeron",
     "description": "Mypy, an optional static type checker for Python, for Nova.",
-    "version": "0.1.0",
+    "version": "0.1.3",
     "categories": ["issues", "commands"],
     "repository": "https://github.com/Aeron/Mypy.novaextension",
     "bugs": "https://github.com/Aeron/Mypy.novaextension/issues",
