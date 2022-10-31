@@ -10,10 +10,15 @@ class IssuesProvider {
     }
 
     async getProcess(filePath, tmpPath) {
-        const executablePath = this.config.get("executablePath");
+        const executablePath = nova.path.expanduser(this.config.get("executablePath"));
         const commandArguments = this.config.get("commandArguments");
         const pythonExecutablePath = this.config.get("pythonExecutablePath");
         let defaultOptions = [filePath];
+
+        if (!nova.fs.stat(executablePath)) {
+            console.error(`Executable does not exist '${executablePath}'`)
+            return
+        }
 
         if (tmpPath) {
             defaultOptions.unshift("--shadow-file", "./" + filePath, tmpPath);
