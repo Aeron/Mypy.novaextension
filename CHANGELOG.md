@@ -2,6 +2,14 @@
 
 These versions follow [Semantic Versioning 2.0](https://semver.org).
 
+## 1.0.0 (2023-05-27)
+
+### Changed
+
++ Arguments handling with the shadow file option
++ Safer promise behavior for expected errors
++ Issues provider minor refactoring
+
 ## 0.1.3 (2022-10-31)
 
 ### Fixed
