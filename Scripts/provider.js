@@ -13,15 +13,11 @@ class IssuesProvider {
         const executablePath = nova.path.expanduser(this.config.get("executablePath"));
         const commandArguments = this.config.get("commandArguments");
         const pythonExecutablePath = this.config.get("pythonExecutablePath");
-        let defaultOptions = [filePath];
+        const defaultOptions = (tmpPath) ? ["--shadow-file", filePath, tmpPath] : [];
 
         if (!nova.fs.stat(executablePath)) {
-            console.error(`Executable does not exist '${executablePath}'`)
-            return
-        }
-
-        if (tmpPath) {
-            defaultOptions.unshift("--shadow-file", "./" + filePath, tmpPath);
+            console.error(`Executable ${executablePath} does not exist`);
+            return;
         }
 
         var options = [];
@@ -43,7 +39,7 @@ class IssuesProvider {
         return new Process(
             executablePath,
             {
-                args: Array.from(new Set(options)),
+                args: [...Array.from(new Set(options)), filePath],
                 stdio: ["ignore", "pipe", "pipe"],
                 cwd: nova.workspace.path,  // NOTE: must be explicitly set
             }
@@ -52,7 +48,7 @@ class IssuesProvider {
 
     async provideIssues(editor) {
         this.issueCollection.clear();
-        return await new Promise(resolve => this.check(editor, resolve));
+        return new Promise((resolve, reject) => this.check(editor, resolve, reject));
     }
 
     async getTemporaryFilename(filePath) {
@@ -68,21 +64,26 @@ class IssuesProvider {
         return hash + "." + Date.now() + ".tmp";
     }
 
-    async check(editor, resolve) {
-        if (editor.document.isEmpty) return;
+    async check(editor, resolve=null, reject=null) {
+        if (editor.document.isEmpty) {
+            if (reject) reject("empty file");
+            return;
+        }
 
-        const textRange = new Range(0, editor.document.length);
-        const content = editor.document.getTextInRange(textRange);
         const filePath = nova.workspace.relativizePath(editor.document.path);
 
         var tmpPath = null;
 
         if (this.config.get("checkMode") === "onChange") {
             const tmpFilename = await this.getTemporaryFilename(filePath);
+
             tmpPath = nova.extension.workspaceStoragePath + "/" + tmpFilename;
+
             const tmpFile = nova.fs.open(tmpPath, "w+t");
 
-            tmpFile.write(content);
+            tmpFile.write(
+                editor.document.getTextInRange(new Range(0, editor.document.length))
+            );
             tmpFile.close();
         }
 
@@ -90,7 +91,10 @@ class IssuesProvider {
 
         const process = await this.getProcess(filePath, tmpPath);
 
-        if (!process) return;
+        if (!process) {
+            if (reject) reject("no process");
+            return;
+        }
 
         process.onStdout((output) => parser.pushLine(output));
         process.onStderr((error) => console.error(error));
@@ -116,6 +120,7 @@ class IssuesProvider {
             if (tmpPath) {
                 nova.fs.remove(tmpPath);
             }
+
             resolve(parser.issues);
             parser.clear();
         });
