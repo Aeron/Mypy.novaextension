@@ -1,8 +1,3 @@
-const categorySeverity = {  // TODO: move to Nova config maybe?
-    "error": "Error",
-    "note": "Info",
-}
-
 class IssuesProvider {
     constructor(config, issueCollection) {
         this.config = config;
@@ -101,15 +96,14 @@ class IssuesProvider {
         process.onDidExit((status) => {
             console.info("Checking " + filePath);
 
+            // NOTE: mypy gives an exclusive range
             for (let issue of parser.issues) {
-                let severity = categorySeverity[issue.code];
+                if (typeof issue.endColumn !== 'undefined') issue.endColumn += 1;
+            }
 
-                if (severity) {
-                    issue.severity = IssueSeverity[severity];
-                }
-
-                // NOTE: Nova version 1.2 and prior has a known bug
-                if (nova.version[0] === 1 && nova.version[1] <= 2) {
+            // NOTE: Nova version 1.2 and prior has a known bug
+            if (nova.version[0] === 1 && nova.version[1] <= 2) {
+                for (let issue of parser.issues) {
                     issue.line += 1;
                     issue.column += 1;
                 }

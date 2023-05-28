@@ -31,12 +31,14 @@
     "issueMatchers": {
         "mypy": {
             "pattern": {
-                "regexp": "^(.*\\.py):(\\d+):(\\d+:)?\\s(\\w+):\\s(.*)",
-                "message": 5,
-                "code": 4,
-                "line": 2,
-                "column": 3,
-                "severity": "error"
+                "regexp": "^.+\\.py.?:(\\d+):(?:(\\d+):)?(?:(\\d+):)?(?:(\\d+):)?\\s(\\w+):\\s(.+(?:\\s\\s\\[(.+)\\])|.+(?!\\s\\s))",
+                "message": 6,
+                "code": 7,
+                "line": 1,
+                "column": 2,
+                "endLine": 3,
+                "endColumn": 4,
+                "severity": 5
             }
         }
     },
@@ -53,7 +55,7 @@
             "title": "Command Arguments",
             "description": "Additional arguments. The --shadow-file option conditionally set.",
             "type": "string",
-            "default": null
+            "default": "--show-error-end --show-error-codes"
         },
         {
             "key": "cc.aeron.nova-mypy.checkMode",
