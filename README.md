@@ -32,8 +32,9 @@ It’s just a handy alias for the `--python-executable` command argument.
 
 ### mypy.ini
 
-The extension respects `mypy.ini` in a project directory. So, there’s no need to
-specify the `--config-file` argument explicitly.
+The extension respects `pyproject.toml`, `mypy.ini`, and `.mypy.ini` in a project
+directory as much as `mypy` command-line utility. So, there’s no need to specify the
+`--config-file` argument explicitly.
 
 ## Caveats
 
