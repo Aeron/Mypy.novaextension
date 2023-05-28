@@ -2,6 +2,17 @@
 
 These versions follow [Semantic Versioning 2.0](https://semver.org).
 
+## 1.1.0 (2023-05-28)
+
+This version mainly introduces support for `--show-error-end` and `--show-error-codes`
+options—they become the default but not mandatory. The inverse options are supported as
+well, so the extension stays backward-compatible.
+
+### Changed
+
++ Extension issue matcher pattern
++ Global default command arguments
+
 ## 1.0.0 (2023-05-27)
 
 ### Changed
