@@ -10,6 +10,10 @@ have one already.
 
 Mypy can be installed simply by running `pip install mypy`.
 
+**Note**: The `--show-error-end` option only exists in version `0.981` or higher.
+Remove it from the global extension configuration if using an earlier version. Yet
+it’s better to use the latest `mypy` available.
+
 ## Configuration
 
 The extension supports both global and workspace configurations.
