@@ -4,7 +4,10 @@
     "organization": "Aeron",
     "description": "Mypy, an optional static type checker for Python, for Nova.",
     "version": "1.1.1",
-    "categories": ["issues", "commands"],
+    "categories": [
+        "issues",
+        "commands"
+    ],
     "repository": "https://github.com/Aeron/Mypy.novaextension",
     "bugs": "https://github.com/Aeron/Mypy.novaextension/issues",
     "license": "Apache-2.0",
@@ -23,7 +26,9 @@
                 "command": "checkWithMypy",
                 "shortcut": "shift-cmd-M",
                 "filters": {
-                    "syntaxes": ["python"]
+                    "syntaxes": [
+                        "python"
+                    ]
                 }
             }
         ]
@@ -63,9 +68,18 @@
             "description": "An event on which to perform a check.",
             "type": "enum",
             "values": [
-                ["onChange", "On a file change"],
-                ["onSave", "On a file save"],
-                ["-", "Command only"]
+                [
+                    "onChange",
+                    "On a file change"
+                ],
+                [
+                    "onSave",
+                    "On a file save"
+                ],
+                [
+                    "-",
+                    "Command only"
+                ]
             ],
             "default": "onChange"
         }
@@ -97,9 +111,18 @@
             "description": "An event on which to perform a check.",
             "type": "enum",
             "values": [
-                ["onChange", "On a file change"],
-                ["onSave", "On a file save"],
-                ["-", "Command only"]
+                [
+                    "onChange",
+                    "On a file change"
+                ],
+                [
+                    "onSave",
+                    "On a file save"
+                ],
+                [
+                    "-",
+                    "Command only"
+                ]
             ]
         }
     ]

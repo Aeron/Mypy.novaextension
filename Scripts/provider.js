@@ -1,13 +1,14 @@
-class IssuesProvider {
-    constructor(config, issueCollection) {
+class IssueProvider {
+    constructor(config) {
         this.config = config;
-        this.issueCollection = issueCollection;
+        this.issueCollection = new IssueCollection("mypy");
+        this.parser = new IssueParser("mypy");
     }
 
-    async getProcess(filePath, tmpPath) {
-        const executablePath = nova.path.expanduser(this.config.get("executablePath"));
-        const commandArguments = this.config.get("commandArguments");
-        const pythonExecutablePath = this.config.get("pythonExecutablePath");
+    getProcess(filePath, tmpPath) {
+        const executablePath = nova.path.expanduser(this.config.executablePath());
+        const commandArguments = this.config.commandArguments();
+        const pythonExecutablePath = this.config.pythonExecutablePath();
         const defaultOptions = (tmpPath) ? ["--shadow-file", filePath, tmpPath] : [];
 
         if (!nova.fs.stat(executablePath)) {
@@ -41,12 +42,11 @@ class IssuesProvider {
         );
     }
 
-    async provideIssues(editor) {
-        this.issueCollection.clear();
+    provideIssues(editor) {
         return new Promise((resolve, reject) => this.check(editor, resolve, reject));
     }
 
-    async getTemporaryFilename(filePath) {
+    getTemporaryFilename(filePath) {
         var hash = 0;
 
         if (filePath.length > 0) {
@@ -56,10 +56,10 @@ class IssuesProvider {
             }
         }
 
-        return hash + "." + Date.now() + ".tmp";
+        return `${hash}.${Date.now()}.tmp`;
     }
 
-    async check(editor, resolve=null, reject=null) {
+    check(editor, resolve = null, reject = null) {
         if (editor.document.isEmpty) {
             if (reject) reject("empty file");
             return;
@@ -69,10 +69,8 @@ class IssuesProvider {
 
         var tmpPath = null;
 
-        if (this.config.get("checkMode") === "onChange") {
-            const tmpFilename = await this.getTemporaryFilename(filePath);
-
-            tmpPath = nova.extension.workspaceStoragePath + "/" + tmpFilename;
+        if (this.config.checkMode() === "onChange") {
+            tmpPath = nova.extension.workspaceStoragePath + "/" + this.getTemporaryFilename(filePath);
 
             const tmpFile = nova.fs.open(tmpPath, "w+t");
 
@@ -82,47 +80,51 @@ class IssuesProvider {
             tmpFile.close();
         }
 
-        const parser = new IssueParser("mypy");
-
-        const process = await this.getProcess(filePath, tmpPath);
+        const process = this.getProcess(filePath, tmpPath);
 
         if (!process) {
             if (reject) reject("no process");
             return;
         }
 
-        process.onStdout((output) => parser.pushLine(output));
+        process.onStdout((output) => this.parser.pushLine(output));
         process.onStderr((error) => console.error(error));
         process.onDidExit((status) => {
-            console.info("Checking " + filePath);
+            console.info(`Checking ${filePath}`);
 
             // NOTE: mypy gives an exclusive range
-            for (let issue of parser.issues) {
-                if (typeof issue.endColumn !== 'undefined') issue.endColumn += 1;
+            for (let issue of this.parser.issues) {
+                if (typeof issue.endColumn !== "undefined") issue.endColumn += 1;
             }
 
             // NOTE: Nova version 1.2 and prior has a known bug
             if (nova.version[0] === 1 && nova.version[1] <= 2) {
-                for (let issue of parser.issues) {
+                for (let issue of this.parser.issues) {
                     issue.line += 1;
                     issue.column += 1;
                 }
             }
 
-            console.info("Found " + parser.issues.length + " issue(s)");
+            console.info(`Found ${this.parser.issues.length} issue(s)`);
 
             if (tmpPath) {
                 nova.fs.remove(tmpPath);
             }
 
-            resolve(parser.issues);
-            parser.clear();
+            this.issueCollection.set(editor.document.uri, this.parser.issues);
+            this.parser.clear();
+
+            // HACK: nova.assistants.registerIssueAssistant uses its own private and
+            // nameless IssueCollection, and that leads to issue duplication between
+            // the command and on-save check. So, we give it nothing, and keep using
+            // our explicit IssueCollection.
+            if (resolve) resolve();
         });
 
-        console.info("Running " + process.command + " " + process.args.join(" "));
+        console.info(`Running ${process.command} ${process.args.join(" ")}`);
 
         process.start();
     }
 }
 
-module.exports = IssuesProvider;
+module.exports = IssueProvider;
