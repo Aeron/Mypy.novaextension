@@ -2,6 +2,14 @@
 
 These versions follow [Semantic Versioning 2.0](https://semver.org).
 
+## 1.1.2 (2024-03-08)
+
+It’s mainly refactoring and optimizations, except for a single issue fix.
+
+### Fixed
+
+- Issue duplication between the command and on-save checking.
+
 ## 1.1.1 (2023-05-29)
 
 ### Changed

@@ -47,13 +47,3 @@ directory as much as `mypy` command-line utility. So, there’s no need to speci
 It requires the `filesystem: read-write` entitlement because of the Mypy [inability
 to read from `stdin`](https://github.com/python/mypy/issues/2119), so the extension
 utilizes temporary shadow-files to solve it in case of check on change mode.
-
-### Using mixed mode
-
-In case you’re using the check on change/save mode, the command is still available
-to use. So, if you try to use command after a check triggered by a related event, and
-there are any errors, then discovered issues become duplicated in the Issues sidebar.
-
-Yet, it’ll come to normal as soon as a related event triggers again.
-
-Hopefully, I’ll find a way to fix it later.
