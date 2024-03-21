@@ -1,3 +1,5 @@
+const utils = require("./utils");
+
 class IssueProvider {
     constructor(config) {
         this.config = config;
@@ -5,37 +7,35 @@ class IssueProvider {
         this.parser = new IssueParser("mypy");
     }
 
-    getProcess(filePath, tmpPath) {
-        const executablePath = nova.path.expanduser(this.config.executablePath());
+    getProcessOptions(filePath, tmpPath = null) {
+        const defaultOptions = (tmpPath)
+            ? ["--shadow-file", filePath, tmpPath] // NOTE: better have the `=` notation but how?
+            : [];
         const commandArguments = this.config.commandArguments();
+        const extraOptions = utils.normalizeOptions(commandArguments);
+
         const pythonExecutablePath = this.config.pythonExecutablePath();
-        const defaultOptions = (tmpPath) ? ["--shadow-file", filePath, tmpPath] : [];
+        const execOptions = (pythonExecutablePath)
+            ? [`--python-executable=${pythonExecutablePath}`]
+            : [];
+
+        return Array.from(new Set([...extraOptions, ...execOptions, ...defaultOptions]));
+    }
+
+    getProcess(filePath, tmpPath = null) {
+        const executablePath = nova.path.expanduser(this.config.executablePath());
 
         if (!nova.fs.stat(executablePath)) {
             console.error(`Executable ${executablePath} does not exist`);
             return;
         }
 
-        var options = [];
-
-        if (commandArguments) {
-            options = commandArguments
-                .replaceAll("\n", " ")
-                .split(" ")
-                .map((option) => option.trim())
-                .filter((option) => option !== " ");
-        }
-
-        if (pythonExecutablePath) {
-            options = [...options, "--python-executable=" + pythonExecutablePath];
-        }
-
-        options = [...options, ...defaultOptions].filter((option) => option !== "");
+        const options = this.getProcessOptions(filePath, tmpPath);
 
         return new Process(
             executablePath,
             {
-                args: [...Array.from(new Set(options)), filePath],
+                args: [...options, filePath],
                 stdio: ["ignore", "pipe", "pipe"],
                 cwd: nova.workspace.path,  // NOTE: must be explicitly set
             }
